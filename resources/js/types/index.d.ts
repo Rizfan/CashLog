@@ -32,7 +32,7 @@ export interface SharedData {
 }
 
 export interface User {
-    id: number;
+    id: string;
     name: string;
     email: string;
     avatar?: string;
@@ -40,4 +40,14 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Budget{
+    id: string;
+    user_id: string;
+    name: string;
+    description: string;
+    amount: number;
+    created_at: string;
+    updated_at: string;
 }
