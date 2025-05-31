@@ -19,7 +19,7 @@ class BudgetController extends Controller
     {
         //
         return Inertia::render('budget/index', [
-            'budgets' => Auth::user()->budgets()->get(),
+            'budgets' => Auth::user()->budgets()->with('transactions')->get(),
         ]);
     }
 

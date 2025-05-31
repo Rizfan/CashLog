@@ -42,7 +42,6 @@ export default function Form(props: { auth: Auth; budget?: Budget | null }) {
                     'X-HTTP-Method-Override': 'PUT',
                 },
                 onSuccess: () => {
-                    // Optionally reset the form or redirect
                     setData({
                         user_id: props.auth.user.id,
                         name: '',
@@ -54,7 +53,6 @@ export default function Form(props: { auth: Auth; budget?: Budget | null }) {
         } else {
             post(route('budgets.store'), {
                 onSuccess: () => {
-                    // Optionally reset the form or redirect
                     setData({
                         user_id: props.auth.user.id,
                         name: '',

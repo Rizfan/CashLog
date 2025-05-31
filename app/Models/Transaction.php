@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Budget extends Model
+class Transaction extends Model
 {
     //
     use HasUuids;
@@ -17,6 +17,7 @@ class Budget extends Model
     ];
     protected $fillable = [
         'user_id',
+        'budget_id',
         'name',
         'description',
         'amount',
@@ -26,8 +27,8 @@ class Budget extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function transactions()
+    public function budget()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->belongsTo(Budget::class);
     }
 }

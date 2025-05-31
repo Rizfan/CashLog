@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -14,6 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('budgets', BudgetController::class)->names('budgets');
+    Route::resource('transactions', TransactionController::class)->names('transactions');
 });
 
 require __DIR__ . '/settings.php';

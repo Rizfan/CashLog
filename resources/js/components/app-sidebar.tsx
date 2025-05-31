@@ -18,6 +18,11 @@ const mainNavItems: NavItem[] = [
         href: '/budgets',
         icon: LayoutGrid,
     },
+    {
+        title: 'Transactions',
+        href: '/transactions',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [];

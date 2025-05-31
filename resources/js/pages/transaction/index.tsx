@@ -12,19 +12,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Budget, type Transaction } from '@/types';
+import { type BreadcrumbItem, type Transaction } from '@/types';
 import { Head, router } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Budget Planning',
-        href: '/budgets',
+        title: 'Transactions Management',
+        href: '/transactions',
     },
 ];
 
-export default function Index({ budgets }: { budgets: Budget[] }) {
-    const handleDelete = (budgetId: string) => {
-        router.delete(route('budgets.destroy', budgetId), {
+export default function Index({ transactions }: { transactions: Transaction[] }) {
+    const handleDelete = (transactionId: string) => {
+        router.delete(route('transactions.destroy', transactionId), {
             onSuccess: () => {
                 router.reload();
             },
@@ -37,60 +37,53 @@ export default function Index({ budgets }: { budgets: Budget[] }) {
             <div className="p-6">
                 <div className="flex flex-col items-center justify-between lg:flex-row">
                     <div className="mb-4 lg:mb-0">
-                        <h1 className="text-2xl font-bold">Budget Planning</h1>
+                        <h1 className="text-2xl font-bold">Catatan Transaksi</h1>
 
                         <p className="text-muted-foreground mt-2">
-                            Rencanakan alokasi anggaran Anda dengan mudah. Di sini Anda dapat membuat, mengelola, dan melacak anggaran Anda.
+                            Kelola dan lacak transaksi Anda dengan mudah. Di sini Anda dapat membuat, mengedit, dan menghapus catatan transaksi.
                         </p>
                     </div>
 
-                    <a href="/budgets/create">
-                        <Button>Tambah Rencana Anggaran</Button>
+                    <a href="/transactions/create">
+                        <Button>Tambah Data Transaksi</Button>
                     </a>
                 </div>
                 <Table className="mt-4">
                     <TableHeader>
                         <TableRow>
                             <TableHead>#</TableHead>
+                            <TableHead>Sumber Dana</TableHead>
                             <TableHead>Nama</TableHead>
-                            <TableHead className="max-w-64">Deskripsi</TableHead>
-                            <TableHead>Anggaran</TableHead>
-                            <TableHead>Sisa</TableHead>
+                            <TableHead>Deskripsi</TableHead>
+                            <TableHead>Jumlah</TableHead>
                             <TableHead>Dibuat Pada</TableHead>
                             <TableHead>Opsi</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {budgets.length === 0 ? (
+                        {transactions.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={6} className="text-center">
                                     Tidak ada rencana anggaran yang ditemukan.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            budgets.map((budget, index) => (
-                                <TableRow key={budget.id}>
+                            transactions.map((transaction, index) => (
+                                <TableRow key={transaction.id}>
                                     <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{budget.name}</TableCell>
-                                    <TableCell className="max-w-64">
-                                        <div className="text-wrap">{budget.description}</div>
-                                    </TableCell>
-                                    <TableCell>{budget.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</TableCell>
+                                    <TableCell>{transaction.budget.name || 'Tidak ada sumber dana'}</TableCell>
+                                    <TableCell>{transaction.name}</TableCell>
+                                    <TableCell>{transaction.description}</TableCell>
+                                    <TableCell>{transaction.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</TableCell>
                                     <TableCell>
-                                        {(
-                                            budget.amount -
-                                            budget.transactions
-                                                .filter((transaction: Transaction) => {
-                                                    const date = new Date(transaction.created_at);
-                                                    const now = new Date();
-                                                    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-                                                })
-                                                .reduce((total: number, transaction: Transaction) => total + transaction.amount, 0)
-                                        ).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                                        {new Date(transaction.created_at).toLocaleDateString('id-ID', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                        })}
                                     </TableCell>
-                                    <TableCell>{new Date(budget.created_at).toLocaleDateString('id-ID')}</TableCell>
                                     <TableCell className="flex items-center space-x-2">
-                                        <a href={`/budgets/${budget.id}/edit`} className="text-blue-600 hover:underline">
+                                        <a href={`/transactions/${transaction.id}/edit`} className="text-blue-600 hover:underline">
                                             <Button>Edit</Button>
                                         </a>
                                         <AlertDialog>
@@ -106,7 +99,7 @@ export default function Index({ budgets }: { budgets: Budget[] }) {
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel>Batal</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(budget.id)}>Hapus</AlertDialogAction>
+                                                    <AlertDialogAction onClick={() => handleDelete(transaction.id)}>Hapus</AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>

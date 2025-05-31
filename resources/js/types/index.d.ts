@@ -44,10 +44,25 @@ export interface User {
 
 export interface Budget{
     id: string;
-    user_id: string;
+    user_id: User.id;
     name: string;
     description: string;
     amount: number;
     created_at: string;
     updated_at: string;
+    user: User;
+    transactions: Transaction[];
+}
+
+export interface Transaction{
+    id: string;
+    budget_id: Budget.id;
+    user_id: User.id;
+    name: string;
+    description: string;
+    amount: number;
+    created_at: string;
+    updated_at: string;
+    budget: Budget; 
+    user: User; 
 }
