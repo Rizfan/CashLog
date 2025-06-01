@@ -16,7 +16,8 @@ class TransactionController extends Controller
     public function index()
     {
         //
-        $transactions = Transaction::with(['user', 'budget'])->get();
+        // $transactions = Transaction::with(['user', 'budget'])->get();
+        $transactions = Auth::user()->transactions()->with('budget')->get();
         return Inertia::render('transaction/index', [
             'transactions' => $transactions,
         ]);

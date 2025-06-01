@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\TransactionController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -11,7 +12,12 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
+        $transaction = Auth::user()->transactions()->with('budget')->get();
+        $budget = Auth::user()->budgets()->with('transactions')->get();
+        return Inertia::render('dashboard', [
+            'transactions' => $transaction,
+            'budgets' => $budget,
+        ]);
     })->name('dashboard');
 
     Route::resource('budgets', BudgetController::class)->names('budgets');

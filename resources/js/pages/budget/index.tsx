@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { dateFormatter } from '@/lib/customUtils';
 import { type BreadcrumbItem, type Budget, type Transaction } from '@/types';
 import { Head, router } from '@inertiajs/react';
 
@@ -21,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/budgets',
     },
 ];
+const now = new Date();
 
 export default function Index({ budgets }: { budgets: Budget[] }) {
     const handleDelete = (budgetId: string) => {
@@ -53,8 +55,14 @@ export default function Index({ budgets }: { budgets: Budget[] }) {
                         <TableRow>
                             <TableHead>#</TableHead>
                             <TableHead>Nama</TableHead>
-                            <TableHead className="max-w-64">Deskripsi</TableHead>
                             <TableHead>Anggaran</TableHead>
+                            <TableHead>
+                                Pengeluaran Bulan:{' '}
+                                {now.toLocaleDateString('id-ID', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                })}
+                            </TableHead>
                             <TableHead>Sisa</TableHead>
                             <TableHead>Dibuat Pada</TableHead>
                             <TableHead>Opsi</TableHead>
@@ -72,23 +80,43 @@ export default function Index({ budgets }: { budgets: Budget[] }) {
                                 <TableRow key={budget.id}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{budget.name}</TableCell>
-                                    <TableCell className="max-w-64">
-                                        <div className="text-wrap">{budget.description}</div>
-                                    </TableCell>
-                                    <TableCell>{budget.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</TableCell>
                                     <TableCell>
-                                        {(
-                                            budget.amount -
-                                            budget.transactions
-                                                .filter((transaction: Transaction) => {
-                                                    const date = new Date(transaction.created_at);
-                                                    const now = new Date();
-                                                    return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-                                                })
-                                                .reduce((total: number, transaction: Transaction) => total + transaction.amount, 0)
-                                        ).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                                        {budget.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                                     </TableCell>
-                                    <TableCell>{new Date(budget.created_at).toLocaleDateString('id-ID')}</TableCell>
+                                    <TableCell>
+                                        {(() => {
+                                            const totalSpent =
+                                                budget.transactions
+                                                    ?.filter((transaction: Transaction) => {
+                                                        const date = new Date(transaction.created_at);
+                                                        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                                                    })
+                                                    .reduce((total: number, transaction: Transaction) => total + transaction.amount, 0) || 0;
+                                            return totalSpent.toLocaleString('id-ID', {
+                                                style: 'currency',
+                                                currency: 'IDR',
+                                                minimumFractionDigits: 0,
+                                            });
+                                        })()}
+                                    </TableCell>
+                                    <TableCell>
+                                        {(() => {
+                                            const totalThisMonth =
+                                                budget.transactions
+                                                    ?.filter((transaction: Transaction) => {
+                                                        const date = new Date(transaction.created_at);
+                                                        return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                                                    })
+                                                    .reduce((total: number, transaction: Transaction) => total + transaction.amount, 0) || 0;
+                                            const remaining = budget.amount - totalThisMonth;
+                                            return remaining.toLocaleString('id-ID', {
+                                                style: 'currency',
+                                                currency: 'IDR',
+                                                minimumFractionDigits: 0,
+                                            });
+                                        })()}
+                                    </TableCell>
+                                    <TableCell>{dateFormatter(budget.created_at)}</TableCell>
                                     <TableCell className="flex items-center space-x-2">
                                         <a href={`/budgets/${budget.id}/edit`} className="text-blue-600 hover:underline">
                                             <Button>Edit</Button>

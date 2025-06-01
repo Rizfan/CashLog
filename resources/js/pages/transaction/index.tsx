@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { dateFormatter } from '@/lib/customUtils';
 import { type BreadcrumbItem, type Transaction } from '@/types';
 import { Head, router } from '@inertiajs/react';
 
@@ -54,7 +55,6 @@ export default function Index({ transactions }: { transactions: Transaction[] })
                             <TableHead>#</TableHead>
                             <TableHead>Sumber Dana</TableHead>
                             <TableHead>Nama</TableHead>
-                            <TableHead>Deskripsi</TableHead>
                             <TableHead>Jumlah</TableHead>
                             <TableHead>Dibuat Pada</TableHead>
                             <TableHead>Opsi</TableHead>
@@ -68,44 +68,40 @@ export default function Index({ transactions }: { transactions: Transaction[] })
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            transactions.map((transaction, index) => (
-                                <TableRow key={transaction.id}>
-                                    <TableCell>{index + 1}</TableCell>
-                                    <TableCell>{transaction.budget.name || 'Tidak ada sumber dana'}</TableCell>
-                                    <TableCell>{transaction.name}</TableCell>
-                                    <TableCell>{transaction.description}</TableCell>
-                                    <TableCell>{transaction.amount.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</TableCell>
-                                    <TableCell>
-                                        {new Date(transaction.created_at).toLocaleDateString('id-ID', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric',
-                                        })}
-                                    </TableCell>
-                                    <TableCell className="flex items-center space-x-2">
-                                        <a href={`/transactions/${transaction.id}/edit`} className="text-blue-600 hover:underline">
-                                            <Button>Edit</Button>
-                                        </a>
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="destructive">Hapus</Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Hapus Rencana Anggaran</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        Apakah Anda yakin ingin menghapus rencana anggaran ini? Tindakan ini tidak dapat dibatalkan.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Batal</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(transaction.id)}>Hapus</AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </TableCell>
-                                </TableRow>
-                            ))
+                            // transaksi berdasarkan yang terakhir dibuat
+                            transactions
+                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                .map((transaction, index) => (
+                                    <TableRow key={transaction.id}>
+                                        <TableCell>{index + 1}</TableCell>
+                                        <TableCell>{transaction.budget.name}</TableCell>
+                                        <TableCell>{transaction.name}</TableCell>
+                                        <TableCell>Rp {transaction.amount.toLocaleString()}</TableCell>
+                                        <TableCell>{dateFormatter(transaction.created_at)}</TableCell>
+                                        <TableCell className="flex items-center space-x-2">
+                                            <a href={`/transactions/${transaction.id}/edit`}>
+                                                <Button variant="outline">Edit</Button>
+                                            </a>
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="destructive">Hapus</Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Hapus Transaksi</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => handleDelete(transaction.id)}>Hapus</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
                         )}
                     </TableBody>
                 </Table>

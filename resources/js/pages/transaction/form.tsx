@@ -139,7 +139,6 @@ export default function Form(props: { auth: Auth; budgets: Budget[] | null; tran
                         <Label htmlFor="description">Deskripsi Transaksi</Label>
                         <Textarea
                             id="description"
-                            required
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
                             disabled={processing}
