@@ -67,7 +67,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
             <Head title="Dashboard" />
             <div className="p-6">
                 <div className="flex flex-col items-center justify-between lg:flex-row">
-                    <div className="mb-4 lg:mb-0">
+                    <div className="mb-4">
                         <h1 className="text-2xl font-bold">Dashboard</h1>
                         <p className="text-muted-foreground mt-2">
                             Pantau dan kelola keuangan Anda dengan mudah. Di sini Anda dapat melihat ringkasan transaksi dan anggaran.
@@ -76,7 +76,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    <div className="rounded-lg bg-white p-4 shadow-md dark:border-1 dark:border-white dark:bg-black">
+                    <div className="dark:bg-sidebar rounded-lg bg-white p-4 shadow-md">
                         <h2 className="mb-4 text-lg font-semibold">
                             Pengeluaran Bulan:{' '}
                             {now.toLocaleDateString('id-ID', {
@@ -85,7 +85,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                             })}
                         </h2>
                         {props.transactions.length > 0 ? (
-                            <Pie data={transactionChartData} options={options} />
+                            <Pie data={transactionChartData} options={options as any} />
                         ) : (
                             <PlaceholderPattern className="h-64" />
                         )}
@@ -106,7 +106,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                         </div>
                     </div>
 
-                    <div className="rounded-lg bg-white p-4 shadow-md dark:border-1 dark:border-white dark:bg-black">
+                    <div className="dark:bg-sidebar rounded-lg bg-white p-4 shadow-md">
                         <h2 className="mb-4 text-lg font-semibold">
                             Anggaran Bulan:{' '}
                             {now.toLocaleDateString('id-ID', {
@@ -114,7 +114,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                                 month: 'long',
                             })}
                         </h2>
-                        {props.budgets.length > 0 ? <Pie data={budgetChartData} options={options} /> : <PlaceholderPattern className="h-64" />}
+                        {props.budgets.length > 0 ? <Pie data={budgetChartData} options={options as any} /> : <PlaceholderPattern className="h-64" />}
                         {/* total anggaran */}
                         <div className="text-muted-foreground mt-4 text-center text-sm">
                             Total Anggaran Bulanan:
@@ -128,7 +128,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                         </div>
                     </div>
 
-                    <div className="h-fit rounded-lg bg-white p-4 shadow-md dark:border-1 dark:border-white dark:bg-black">
+                    <div className="dark:bg-sidebar h-fit rounded-lg bg-white p-4 shadow-md">
                         <h2 className="mb-4 text-lg font-semibold">
                             Sisa Anggaran Bulan:{' '}
                             {now.toLocaleDateString('id-ID', {
@@ -173,7 +173,14 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                             {props.budgets
                                 .reduce((total, budget) => {
                                     const totalSpent = props.transactions
-                                        .filter((transaction) => transaction.budget_id === budget.id)
+                                        .filter((transaction) => {
+                                            const date = new Date(transaction.created_at);
+                                            return (
+                                                date.getMonth() === now.getMonth() &&
+                                                date.getFullYear() === now.getFullYear() &&
+                                                transaction.budget_id === budget.id
+                                            );
+                                        })
                                         .reduce((sum, transaction) => sum + transaction.amount, 0);
                                     return total + (budget.amount - totalSpent);
                                 }, 0)
@@ -190,10 +197,10 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                     {props.transactions.length > 0 ? (
                         <ul className="space-y-4">
                             {props.transactions
-                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
                                 .slice(0, 5)
                                 .map((transaction) => (
-                                    <li key={transaction.id} className="rounded-lg bg-white p-4 shadow dark:border-1 dark:border-white dark:bg-black">
+                                    <li key={transaction.id} className="dark:bg-sidebar rounded-lg bg-white p-4 shadow">
                                         <h3 className="text-md font-semibold">{transaction.name}</h3>
                                         <p className="text-muted-foreground text-sm">
                                             Jumlah:

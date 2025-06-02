@@ -1,20 +1,9 @@
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { dateFormatter } from '@/lib/customUtils';
 import { type BreadcrumbItem, type Transaction } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { columns } from './columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,13 +13,16 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ transactions }: { transactions: Transaction[] }) {
-    const handleDelete = (transactionId: string) => {
-        router.delete(route('transactions.destroy', transactionId), {
-            onSuccess: () => {
-                router.reload();
-            },
-        });
-    };
+    const data = transactions
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .map((transaction) => ({
+            id: transaction.id,
+            name: transaction.name,
+            source: transaction.budget?.name || 'Tidak ada sumber',
+            amount: transaction.amount,
+            created_at: transaction.created_at,
+            actions: transaction.id,
+        }));
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -49,7 +41,7 @@ export default function Index({ transactions }: { transactions: Transaction[] })
                         <Button>Tambah Data Transaksi</Button>
                     </a>
                 </div>
-                <Table className="mt-4">
+                {/* <Table className="mt-4">
                     <TableHeader>
                         <TableRow>
                             <TableHead>#</TableHead>
@@ -104,7 +96,8 @@ export default function Index({ transactions }: { transactions: Transaction[] })
                                 ))
                         )}
                     </TableBody>
-                </Table>
+                </Table> */}
+                <DataTable columns={columns} data={data as any} />
             </div>
         </AppLayout>
     );
