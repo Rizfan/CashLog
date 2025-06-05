@@ -69,7 +69,7 @@ export default function Form(props: { auth: Auth; budget?: Budget | null }) {
             <Head title="Create Budget" />
             <div className="p-6">
                 <h1 className="mb-4 text-2xl font-bold">Buat Rencana Alokasi Anggaran</h1>
-                <form onSubmit={handleSubmit} className="w-1/2 space-y-4">
+                <form onSubmit={handleSubmit} className="w-full space-y-4 lg:w-1/2">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Nama Anggaran</Label>
                         <Input

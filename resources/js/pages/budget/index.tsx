@@ -2,7 +2,7 @@ import { DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Budget, type Transaction } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { columns } from './columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -28,14 +28,6 @@ export default function Index({ budgets }: { budgets: Budget[] }) {
         created_at: budget.created_at,
     }));
 
-    const handleDelete = (budgetId: string) => {
-        router.delete(route('budgets.destroy', budgetId), {
-            onSuccess: () => {
-                router.reload();
-            },
-        });
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Budget Planning" />
@@ -53,7 +45,7 @@ export default function Index({ budgets }: { budgets: Budget[] }) {
                         <Button>Tambah Rencana Anggaran</Button>
                     </a>
                 </div>
-                <DataTable data={data as any} columns={columns} />
+                <DataTable data={data} columns={columns} />
             </div>
         </AppLayout>
     );

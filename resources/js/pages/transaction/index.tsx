@@ -41,63 +41,7 @@ export default function Index({ transactions }: { transactions: Transaction[] })
                         <Button>Tambah Data Transaksi</Button>
                     </a>
                 </div>
-                {/* <Table className="mt-4">
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>#</TableHead>
-                            <TableHead>Sumber Dana</TableHead>
-                            <TableHead>Nama</TableHead>
-                            <TableHead>Jumlah</TableHead>
-                            <TableHead>Dibuat Pada</TableHead>
-                            <TableHead>Opsi</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {transactions.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={6} className="text-center">
-                                    Tidak ada rencana anggaran yang ditemukan.
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            // transaksi berdasarkan yang terakhir dibuat
-                            transactions
-                                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                                .map((transaction, index) => (
-                                    <TableRow key={transaction.id}>
-                                        <TableCell>{index + 1}</TableCell>
-                                        <TableCell>{transaction.budget.name}</TableCell>
-                                        <TableCell>{transaction.name}</TableCell>
-                                        <TableCell>Rp {transaction.amount.toLocaleString()}</TableCell>
-                                        <TableCell>{dateFormatter(transaction.created_at)}</TableCell>
-                                        <TableCell className="flex items-center space-x-2">
-                                            <a href={`/transactions/${transaction.id}/edit`}>
-                                                <Button variant="outline">Edit</Button>
-                                            </a>
-                                            <AlertDialog>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button variant="destructive">Hapus</Button>
-                                                </AlertDialogTrigger>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle>Hapus Transaksi</AlertDialogTitle>
-                                                        <AlertDialogDescription>
-                                                            Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.
-                                                        </AlertDialogDescription>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel>Batal</AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete(transaction.id)}>Hapus</AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                        )}
-                    </TableBody>
-                </Table> */}
-                <DataTable columns={columns} data={data as any} />
+                <DataTable columns={columns} data={data} />
             </div>
         </AppLayout>
     );

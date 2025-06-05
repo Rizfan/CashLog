@@ -74,7 +74,7 @@ export default function Form(props: { auth: Auth; budgets: Budget[] | null; tran
             <Head title="Create Budget" />
             <div className="p-6">
                 <h1 className="mb-4 text-2xl font-bold">Buat data tranksaksi anda</h1>
-                <form onSubmit={handleSubmit} className="w-1/2 space-y-4">
+                <form onSubmit={handleSubmit} className="w-full space-y-4 lg:w-1/2">
                     <div className="grid gap-2">
                         <Label>Pilih Sumber Anggaran</Label>
                         <Select value={data.budget_id} onValueChange={(value) => setData('budget_id', value)} disabled={processing} required>

@@ -18,7 +18,7 @@ const now = new Date();
 const options = {
     responsive: true,
     plugins: {
-        legend: { position: 'top', fullsize: true, align: 'center' },
+        legend: { position: 'top' as const, fullsize: true, align: 'center' as const },
         tooltip: { enabled: true },
         title: {
             display: true,
@@ -85,7 +85,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                             })}
                         </h2>
                         {props.transactions.length > 0 ? (
-                            <Pie data={transactionChartData} options={options as any} />
+                            <Pie data={transactionChartData} options={options} />
                         ) : (
                             <PlaceholderPattern className="h-64" />
                         )}
@@ -114,7 +114,7 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                                 month: 'long',
                             })}
                         </h2>
-                        {props.budgets.length > 0 ? <Pie data={budgetChartData} options={options as any} /> : <PlaceholderPattern className="h-64" />}
+                        {props.budgets.length > 0 ? <Pie data={budgetChartData} options={options} /> : <PlaceholderPattern className="h-64" />}
                         {/* total anggaran */}
                         <div className="text-muted-foreground mt-4 text-center text-sm">
                             Total Anggaran Bulanan:
