@@ -3,9 +3,9 @@ import AppLayout from '@/layouts/app-layout';
 import { dateTimeFormatter } from '@/lib/customUtils';
 import { type BreadcrumbItem, type Budget, type Transaction } from '@/types';
 import { Head } from '@inertiajs/react';
-import { ArcElement, Chart, Legend, Tooltip } from 'chart.js';
+import { ArcElement, Chart, Colors, Legend, Tooltip } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-Chart.register(ArcElement, Tooltip, Legend);
+Chart.register(ArcElement, Tooltip, Legend, Colors);
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -45,7 +45,6 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                         .reduce((sum: number, transaction: Transaction) => sum + transaction.amount, 0);
                     return totalSpent;
                 }),
-                backgroundColor: ['rgb(255, 99, 132)', 'rgb(54, 162, 235)', 'rgb(255, 205, 86)'],
                 borderWidth: 1,
             },
         ],
@@ -57,7 +56,6 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
             {
                 label: 'Anggaran',
                 data: props.budgets.map((budget: Budget) => budget.amount),
-                backgroundColor: ['rgb(75, 192, 192)', 'rgb(153, 102, 255)', 'rgb(255, 159, 64)'],
                 borderWidth: 1,
             },
         ],
