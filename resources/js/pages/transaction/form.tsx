@@ -9,12 +9,12 @@ import { type Auth, type BreadcrumbItem, type Budget, type Transaction } from '@
 import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 
-type TransactionFormData = {
+export type TransactionFormData = {
     user_id: string;
     budget_id: string;
     name: string;
     description: string;
-    amount: number;
+    amount: number | null;
 };
 
 export default function Form(props: { auth: Auth; budgets: Budget[] | null; transaction?: Transaction | null }) {

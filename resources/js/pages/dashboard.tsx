@@ -1,10 +1,31 @@
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+
+import InputError from '@/components/input-error';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { dateTimeFormatter } from '@/lib/customUtils';
-import { type BreadcrumbItem, type Budget, type Transaction } from '@/types';
-import { Head } from '@inertiajs/react';
+import { type Auth, type BreadcrumbItem, type Budget, type Transaction } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
 import { ArcElement, Chart, Colors, Legend, Tooltip } from 'chart.js';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 import { Pie } from 'react-chartjs-2';
+import { type TransactionFormData } from './transaction/form';
+
 Chart.register(ArcElement, Tooltip, Legend, Colors);
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -26,7 +47,33 @@ const options = {
     },
 };
 
-export default function Dashboard(props: { transactions: Transaction[]; budgets: Budget[] }) {
+export default function Dashboard(props: { auth: Auth; transactions: Transaction[]; budgets: Budget[] }) {
+    const { data, setData, post, processing, errors } = useForm<TransactionFormData>({
+        user_id: props.auth.user.id,
+        budget_id: '',
+        name: '',
+        description: '',
+        amount: null,
+    });
+
+    const handleSubmit: FormEventHandler = (e) => {
+        e.preventDefault();
+        post(route('transactions.store'), {
+            onSuccess: () => {
+                setData({
+                    user_id: props.auth.user.id,
+                    budget_id: '',
+                    name: '',
+                    description: '',
+                    amount: null,
+                });
+            },
+            onError: (errors) => {
+                console.error('Terjadi kesalahan:', errors);
+            },
+        });
+    };
+
     const transactionChartData = {
         title: 'Pengeluaran',
         labels: props.budgets.map((budget: Budget) => budget.name),
@@ -70,6 +117,130 @@ export default function Dashboard(props: { transactions: Transaction[]; budgets:
                         <p className="text-muted-foreground mt-2">
                             Pantau dan kelola keuangan Anda dengan mudah. Di sini Anda dapat melihat ringkasan transaksi dan anggaran.
                         </p>
+                    </div>
+                    <div className="mb-4">
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button variant="outline">Tambah Transaksi</Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <form onSubmit={handleSubmit} className="w-full space-y-4">
+                                    <DialogHeader>
+                                        <DialogTitle>Tambah Transaksi</DialogTitle>
+                                        <DialogDescription>Tambahkan transaksi baru untuk melacak pengeluaran Anda.</DialogDescription>
+                                    </DialogHeader>
+
+                                    <div className="grid gap-2">
+                                        <Label>Pilih Sumber Anggaran</Label>
+                                        <Select
+                                            value={data.budget_id}
+                                            onValueChange={(value) => setData('budget_id', value)}
+                                            disabled={processing}
+                                            required
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Pilih anggaran" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectGroup>
+                                                    <SelectLabel>Anggaran</SelectLabel>
+                                                    {/* menampilkan budge yang dananya masih tersisa */}
+                                                    {props.budgets
+                                                        .filter((budget) => {
+                                                            const totalSpent = props.transactions
+                                                                .filter((transaction) => transaction.budget_id === budget.id)
+                                                                .reduce((sum, transaction) => sum + transaction.amount, 0);
+                                                            return budget.amount - totalSpent > 0;
+                                                        })
+                                                        .map((budget) => (
+                                                            <SelectItem key={budget.id} value={budget.id}>
+                                                                {budget.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                </SelectGroup>
+                                            </SelectContent>
+                                        </Select>
+                                        <InputError message={errors.budget_id} className="mt-2" />
+                                        {props.budgets && data.budget_id && (
+                                            <div className="text-muted-foreground text-sm">
+                                                Jumlah Anggaran Tersisa:{' '}
+                                                {(() => {
+                                                    const budget = props.budgets.find((budget) => budget.id === data.budget_id);
+                                                    if (!budget) return 'Rp0';
+
+                                                    const totalThisMonth =
+                                                        budget.transactions
+                                                            ?.filter((transaction: Transaction) => {
+                                                                const date = new Date(transaction.created_at);
+                                                                return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+                                                            })
+                                                            .reduce((total: number, transaction: Transaction) => total + transaction.amount, 0) || 0;
+
+                                                    const remaining = budget.amount - totalThisMonth;
+
+                                                    return remaining.toLocaleString('id-ID', {
+                                                        style: 'currency',
+                                                        currency: 'IDR',
+                                                        minimumFractionDigits: 0,
+                                                    });
+                                                })()}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="name">Nama Transaksi</Label>
+                                        <Input
+                                            id="name"
+                                            type="text"
+                                            required
+                                            autoFocus
+                                            autoComplete="off"
+                                            value={data.name}
+                                            onChange={(e) => setData('name', e.target.value)}
+                                            disabled={processing}
+                                            placeholder="Masukkan nama Transaksi"
+                                        />
+                                        <InputError message={errors.name} className="mt-2" />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="description">Deskripsi</Label>
+                                        <Textarea
+                                            id="description"
+                                            value={data.description}
+                                            onChange={(e) => setData('description', e.target.value)}
+                                            disabled={processing}
+                                            placeholder="Masukkan deskripsi Transaksi"
+                                        />
+                                        <InputError message={errors.description} className="mt-2" />
+                                    </div>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="amount">Jumlah</Label>
+                                        <Input
+                                            id="amount"
+                                            type="number"
+                                            required
+                                            value={data.amount || ''}
+                                            onChange={(e) => setData('amount', parseFloat(e.target.value))}
+                                            disabled={processing}
+                                            placeholder="Masukkan jumlah Transaksi"
+                                        />
+                                        <InputError message={errors.amount} className="mt-2" />
+                                    </div>
+                                    <input type="hidden" name="user_id" value={data.user_id} />
+
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                            <Button variant="outline">Cancel</Button>
+                                        </DialogClose>
+
+                                        <Button type="submit" disabled={processing}>
+                                            {processing ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                            Simpan
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
 
