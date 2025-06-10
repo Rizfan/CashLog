@@ -10,10 +10,12 @@ use Inertia\Inertia;
 //     return Inertia::render('welcome');
 // })->name('home');
 
+
+Route::get('/', function () {
+    return redirect()->route('dashboard');
+})->name('home');
+
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/', function () {
-        return redirect()->route('dashboard');
-    })->name('home');
     Route::get('dashboard', function () {
         $transaction = Auth::user()->transactions()->with('budget')->get();
         $budget = Auth::user()->budgets()->with('transactions')->get();
