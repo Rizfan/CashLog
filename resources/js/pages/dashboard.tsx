@@ -121,7 +121,7 @@ export default function Dashboard(props: { auth: Auth; transactions: Transaction
                     <div className="mb-4">
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button variant="outline">Tambah Transaksi</Button>
+                                <Button>Tambah Transaksi</Button>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[425px]">
                                 <form onSubmit={handleSubmit} className="w-full space-y-4">
@@ -193,7 +193,6 @@ export default function Dashboard(props: { auth: Auth; transactions: Transaction
                                             id="name"
                                             type="text"
                                             required
-                                            autoFocus
                                             autoComplete="off"
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
